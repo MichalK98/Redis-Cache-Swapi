@@ -1,6 +1,8 @@
 const express = require("express");
 const fetch = require("node-fetch");
+const Redis = require("ioredis");
 
+const redis = new Redis();
 const app = express();
 
 const port = 8080;
@@ -17,7 +19,10 @@ async function getPeople(req, res, next) {
     const people = req.params.id;
     const response = await fetch(`https://swapi.dev/api/people/${people}`);
     const data = await response.json();
-    
+
+    redis.set(people, data.name);
+    console.log(await redis.get(people));
+
     res.send(data.name)
   } catch (err) {
     console.error(err);
